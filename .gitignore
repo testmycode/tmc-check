@@ -1,0 +1,4 @@
+*.o
+/tmc-check-example
+/tmc_test_results.xml
+/tmc_available_points.txt
