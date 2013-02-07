@@ -9,7 +9,7 @@ tmc-check-example: $(SRC_FILES)
 	gcc $(CHECK_CFLAGS) -o$@ $(SRC_FILES) $(CHECK_LDFLAGS)
 
 clean:
-	rm -f tmc-check-example
+	rm -f tmc-check-example tmc_available_points.txt tmc_test_results.xml
 
 run-example: tmc-check-example
 	# Printing available points
