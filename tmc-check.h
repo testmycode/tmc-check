@@ -7,7 +7,7 @@
 void _tmc_register_test(Suite *s, TFun tf, const char *fname, const char *points);
 
 /**
- * Runs a test suite so that tmc_test_results.xml and tmc_available_points.txt are created.
+ * Runs a test suite so that tmc_test_results.xml and tmc_test_points.txt are created.
  *
  * To be called from main() after creating the Suite.
  *
@@ -25,8 +25,11 @@ int tmc_run_tests(int argc, const char **argv, Suite *s);
  *
  * This is a lower level alternative to using tmc_register_test.
  */
-void tmc_set_tcase_points(TCase *tc, const char *points);
+void tmc_set_tcase_points(TCase *tc, const char *tc_name, const char *points);
 
 
-/** Prints all registered points once (in no particular order) to the given output. */
+/** Prints all registered points once (in no particular order) to the given file. */
 int tmc_print_available_points(FILE *f, char delimiter);
+
+/** Prints lines with [testname] [point [point [...]]] to the given file. */
+int tmc_print_test_points(FILE *f);

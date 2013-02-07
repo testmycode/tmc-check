@@ -8,6 +8,7 @@
 typedef struct PointsAssoc
 {
     TCase *tc;
+    const char *tc_name;
     const char *points;
     struct PointsAssoc *next;
 } PointsAssoc;
@@ -25,11 +26,11 @@ static void parse_points(const char *points, PointsList **target_list);
 static void add_to_point_set(const char *point, ssize_t len, PointsList **target_list);
 static int points_list_contains(const PointsList *list, const char *point, ssize_t len);
 
-
-void tmc_set_tcase_points(TCase *tc, const char *points)
+void tmc_set_tcase_points(TCase *tc, const char *tc_name, const char *points)
 {
     PointsAssoc *pa = (PointsAssoc*)malloc(sizeof(PointsAssoc));
     pa->tc = tc;
+    pa->tc_name = tc_name;
     pa->points = points;
     pa->next = points_assocs;
     points_assocs = pa;
@@ -40,7 +41,7 @@ void tmc_set_tcase_points(TCase *tc, const char *points)
 void _tmc_register_test(Suite *s, TFun tf, const char *fname, const char *points)
 {
     TCase *tc = tcase_create(fname);
-    tmc_set_tcase_points(tc, points);
+    tmc_set_tcase_points(tc, fname, points);
     _tcase_add_test(tc, tf, fname, 0, 0, 0, 1);
     suite_add_tcase(s, tc);
 }
@@ -55,7 +56,7 @@ int tmc_run_tests(int argc, const char **argv, Suite *s)
     }
 
     FILE *points_file = fopen("tmc_available_points.txt", "wb");
-    if (tmc_print_available_points(points_file, '\n') != 0) {
+    if (tmc_print_test_points(points_file) != 0) {
         fclose(points_file);
         return EXIT_FAILURE;
     }
@@ -64,7 +65,6 @@ int tmc_run_tests(int argc, const char **argv, Suite *s)
     SRunner *sr = srunner_create(s);
     srunner_set_xml(sr, "tmc_test_results.xml");
     srunner_run_all(sr, CK_VERBOSE);
-    int failed = srunner_ntests_failed(sr);
     srunner_free(sr);
 
     return EXIT_SUCCESS;
@@ -77,6 +77,17 @@ int tmc_print_available_points(FILE *f, char delimiter)
         fputs(pl->point, f);
         fputc(delimiter, f);
         pl = pl->next;
+    }
+    fflush(f);
+    return 0;
+}
+
+int tmc_print_test_points(FILE *f)
+{
+    const PointsAssoc *pa = points_assocs;
+    while (pa != NULL) {
+        fprintf(f, "%s %s\n", pa->tc_name, pa->points);
+        pa = pa->next;
     }
     fflush(f);
     return 0;
@@ -122,7 +133,7 @@ static void add_to_point_set(const char *point, ssize_t len, PointsList **target
 static int points_list_contains(const PointsList *list, const char *point, ssize_t len)
 {
     const PointsList *pl = all_points;
-    while (pl!= NULL) {
+    while (pl != NULL) {
         if (strncmp(pl->point, point, len) == 0) {
             return 1;
         }
