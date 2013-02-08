@@ -4,9 +4,12 @@
 
 /** A shorthand to make a one function testcase with the given points into a suite. */
 #define tmc_register_test(suite, tf, points) _tmc_register_test((suite), (tf), "" # tf, points)
-#define tmc_suite_create(name, points) _tmc_register_suite_points(name, points)
 void _tmc_register_test(Suite *s, TFun tf, const char *fname, const char *points);
+
+/** A shorthand to make one test suite with the given points */
+#define tmc_suite_create(name, points) _tmc_register_suite_points(name, points)
 Suite* _tmc_register_suite_points(const char *name, const char *points);
+
 
 /**
  * Runs a test suite so that tmc_test_results.xml and tmc_test_points.txt are created.
@@ -29,6 +32,12 @@ int tmc_run_tests(int argc, const char **argv, Suite *s);
  */
 void tmc_set_tcase_points(TCase *tc, const char *tc_name, const char *points);
 
+/**
+ * Set the points of a test suite
+ *
+ * This is a lower level alternative to using tmc_suite_create.
+ */
+void tmc_set_suite_points (Suite *s, const char *s_name, const char *points);
 
 /** Prints all registered points once (in no particular order) to the given file. */
 int tmc_print_available_points(FILE *f, char delimiter);
