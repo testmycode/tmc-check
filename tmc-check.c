@@ -5,6 +5,14 @@
 #include <stdio.h>
 #include <ctype.h>
 
+typedef struct SuitePoints
+{
+    Suite *s;
+    const char *s_name;
+    const char *points;
+    struct SuitePoints *next;
+} SuitePoints;
+
 typedef struct PointsAssoc
 {
     TCase *tc;
@@ -20,6 +28,7 @@ typedef struct PointsList
 } PointsList;
 
 static PointsAssoc *points_assocs = NULL;
+static SuitePoints *suite_points = NULL;
 static PointsList *all_points = NULL;
 
 static void parse_points(const char *points, PointsList **target_list);
@@ -46,6 +55,25 @@ void _tmc_register_test(Suite *s, TFun tf, const char *fname, const char *points
     suite_add_tcase(s, tc);
 }
 
+void tmc_set_suite_points(Suite *s, const char *s_name, const char *points)
+{
+    SuitePoints *sp = (SuitePoints*) malloc(sizeof(SuitePoints));
+    sp->s = s;
+    sp->points = points;
+    sp->s_name = s_name;
+    sp->next = suite_points;
+    suite_points = sp;
+
+    parse_points(points, &all_points);
+}
+
+Suite* tmc_suite_create(const char *name, const char *points)
+{
+    Suite *s = suite_create(name);
+    tmc_set_suite_points(s, name, points);
+    return s;
+}
+
 int tmc_run_tests(int argc, const char **argv, Suite *s)
 {
     int i;
@@ -56,6 +84,10 @@ int tmc_run_tests(int argc, const char **argv, Suite *s)
     }
 
     FILE *points_file = fopen("tmc_available_points.txt", "wb");
+    if (tmc_print_suite_points(points_file) != 0) {
+        fclose(points_file);
+        return EXIT_FAILURE;
+    }
     if (tmc_print_test_points(points_file) != 0) {
         fclose(points_file);
         return EXIT_FAILURE;
@@ -86,8 +118,19 @@ int tmc_print_test_points(FILE *f)
 {
     const PointsAssoc *pa = points_assocs;
     while (pa != NULL) {
-        fprintf(f, "%s %s\n", pa->tc_name, pa->points);
+        fprintf(f, "[test] %s %s\n", pa->tc_name, pa->points);
         pa = pa->next;
+    }
+    fflush(f);
+    return 0;
+}
+
+int tmc_print_suite_points(FILE *f)
+{
+    const SuitePoints *sp = suite_points;
+    while (sp != NULL) {
+        fprintf(f, "[suite] %s %s\n", sp->s_name, sp->points);
+        sp = sp->next;
     }
     fflush(f);
     return 0;

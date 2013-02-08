@@ -6,7 +6,7 @@ SRC_FILES=tmc-check-example.c tmc-check.c
 all: tmc-check-example
 
 tmc-check-example: $(SRC_FILES)
-	gcc $(CHECK_CFLAGS) -Wall -o$@ $(SRC_FILES) $(CHECK_LDFLAGS)
+	gcc $(CHECK_CFLAGS) -Wall -o $@ $(SRC_FILES) $(CHECK_LDFLAGS)
 
 clean:
 	rm -f tmc-check-example tmc_available_points.txt tmc_test_results.xml
