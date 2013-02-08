@@ -2,12 +2,14 @@
 #include <check.h>
 #include <stdio.h>
 
-/** A shorthand to make a one function testcase with the given points into a suite. */
-#define tmc_register_test(suite, tf, points) _tmc_register_test((suite), (tf), "" # tf, points)
-void _tmc_register_test(Suite *s, TFun tf, const char *fname, const char *points);
+/***** Main API *****/
 
 /** A shorthand to make one test suite with the given points */
 Suite* tmc_suite_create(const char *name, const char *points);
+
+/** A shorthand to make a one function testcase with the given points into a suite. */
+#define tmc_register_test(suite, tf, points) _tmc_register_test((suite), (tf), "" # tf, points)
+void _tmc_register_test(Suite *s, TFun tf, const char *fname, const char *points);
 
 
 /**
@@ -23,6 +25,8 @@ Suite* tmc_suite_create(const char *name, const char *points);
  */
 int tmc_run_tests(int argc, const char **argv, Suite *s);
 
+
+/***** Low-level API *****/
 
 /**
  * Set the points of a test case.
@@ -41,7 +45,7 @@ void tmc_set_suite_points (Suite *s, const char *s_name, const char *points);
 /** Prints all registered points once (in no particular order) to the given file. */
 int tmc_print_available_points(FILE *f, char delimiter);
 
-/** Prints lines with [testname] [point [point [...]]] to the given file. */
+/** Prints lines like "[test] testname pointname1 pointname2" to the given file. */
 int tmc_print_test_points(FILE *f);
-/** Prints lines with [suitename] [point [point [...]]] to given file */
+/** Prints lines with "[suite] suitename pointname1 pointname2" to given file */
 int tmc_print_suite_points(FILE *f);
