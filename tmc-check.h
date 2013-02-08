@@ -7,8 +7,7 @@
 void _tmc_register_test(Suite *s, TFun tf, const char *fname, const char *points);
 
 /** A shorthand to make one test suite with the given points */
-#define tmc_suite_create(name, points) _tmc_register_suite_points(name, points)
-Suite* _tmc_register_suite_points(const char *name, const char *points);
+Suite* tmc_suite_create(const char *name, const char *points);
 
 
 /**

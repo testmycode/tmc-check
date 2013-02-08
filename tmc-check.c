@@ -67,7 +67,7 @@ void tmc_set_suite_points(Suite *s, const char *s_name, const char *points)
     parse_points(points, &all_points);
 }
 
-Suite* _tmc_register_suite_points(const char *name, const char *points)
+Suite* tmc_suite_create(const char *name, const char *points)
 {
     Suite *s = suite_create(name);
     tmc_set_suite_points(s, name, points);
@@ -118,7 +118,7 @@ int tmc_print_test_points(FILE *f)
 {
     const PointsAssoc *pa = points_assocs;
     while (pa != NULL) {
-        fprintf(f, "%s %s\n", pa->tc_name, pa->points);
+        fprintf(f, "[test] %s %s\n", pa->tc_name, pa->points);
         pa = pa->next;
     }
     fflush(f);
@@ -129,7 +129,7 @@ int tmc_print_suite_points(FILE *f)
 {
     const SuitePoints *sp = suite_points;
     while (sp != NULL) {
-        fprintf(f, "%s %s\n", sp->s_name, sp->points);
+        fprintf(f, "[suite] %s %s\n", sp->s_name, sp->points);
         sp = sp->next;
     }
     fflush(f);
