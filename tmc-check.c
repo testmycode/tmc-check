@@ -118,7 +118,7 @@ int tmc_print_test_points(FILE *f)
 {
     const PointsAssoc *pa = points_assocs;
     while (pa != NULL) {
-        fprintf(f, "[test] %s %s\n", pa->tc_name, pa->points);
+        fprintf(f, "[test] [%s] %s\n", pa->tc_name, pa->points);
         pa = pa->next;
     }
     fflush(f);
@@ -129,7 +129,7 @@ int tmc_print_suite_points(FILE *f)
 {
     const SuitePoints *sp = suite_points;
     while (sp != NULL) {
-        fprintf(f, "[suite] %s %s\n", sp->s_name, sp->points);
+        fprintf(f, "[suite] [%s] %s\n", sp->s_name, sp->points);
         sp = sp->next;
     }
     fflush(f);
