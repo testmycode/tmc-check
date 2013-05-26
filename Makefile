@@ -1,19 +1,44 @@
 
+PREFIX=/usr/local
+
 CHECK_CFLAGS=$(shell pkg-config --cflags check)
 CHECK_LDFLAGS=$(shell pkg-config --libs check)
-SRC_FILES=tmc-check-example.c tmc-check.c
+SRC_FILES=tmc-check.c
 HEADER_FILES=tmc-check.h
+SO_FILE=libtmccheck.so
+PKG_CONFIG_FILE=tmccheck.pc
 
-all: tmc-check-example
+all: libtmccheck.so
 
-tmc-check-example: $(SRC_FILES) $(HEADER_FILES)
-	gcc $(CHECK_CFLAGS) -Wall -o $@ $(SRC_FILES) $(CHECK_LDFLAGS)
+$(SO_FILE): tmc-check.o
+	gcc -o $@ -g -O1 tmc-check.o -shared
+
+tmc-check.o: $(SRC_FILES) $(HEADER_FILES)
+	gcc -c $(CHECK_CFLAGS) -Wall -fPIC -o $@ $(SRC_FILES)
+
 
 clean:
-	rm -f tmc-check-example tmc_available_points.txt tmc_test_results.xml
+	make -C example clean
+	rm -f *.o $(SO_FILE) $(PKG_CONFIG_FILE)
 
-run-example: tmc-check-example
-	# Printing available points
-	./tmc-check-example --print-available-points
-	# Running test. There should be one success and one failure.
-	./tmc-check-example
+run-example:
+	make -C example run-example
+
+$(PKG_CONFIG_FILE): $(PKG_CONFIG_FILE).in
+	sed 's|__PREFIX__|$(PREFIX)|' < $< > $@
+
+install: $(SO_FILE) $(PKG_CONFIG_FILE)
+	install -m 755 -d $(PREFIX)/include
+	install -m 755 -d $(PREFIX)/lib
+	install -m 755 -d $(PREFIX)/lib/pkgconfig
+	install -m 644 $(HEADER_FILES) $(PREFIX)/include
+	install -m 644 -T $(SO_FILE) $(PREFIX)/lib/$(SO_FILE).0.0.0
+	install -m 644 $(PKG_CONFIG_FILE) $(PREFIX)/lib/pkgconfig
+	cd $(PREFIX)/lib && { ln -s -f $(SO_FILE).0.0.0 $(SO_FILE).0; }
+	cd $(PREFIX)/lib && { ln -s -f $(SO_FILE).0.0.0 $(SO_FILE); }
+	if [ "`whoami`" = "root" ]; then ldconfig; fi
+
+uninstall:
+	for header in $(HEADER_FILES); do rm -f $(PREFIX)/include/$$header; done
+	rm -f $(PREFIX)/lib/$(SO_FILE) $(PREFIX)/lib/$(SO_FILE).*
+	rm -f $(PREFIX)/lib/pkgconfig/$(PKG_CONFIG_FILE)

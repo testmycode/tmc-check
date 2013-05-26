@@ -1,0 +1,12 @@
+prefix=__PREFIX__
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: TMC Check
+Description: TMC extension to the Check unit test framework
+URL: http://github.com/testmycode
+Version: 0.1
+Requires: check >= 0.9.8
+Libs: -ltmccheck
+Cflags: -I${includedir} -pthread
