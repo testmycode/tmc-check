@@ -1,0 +1,55 @@
+#!/usr/bin/env ruby
+require 'rubygems'
+require 'nokogiri'
+require 'json'
+
+if ARGV.length > 1
+  puts "Usage: #{$0} [path-to-test-result-directory]"
+  exit 1
+elsif ARGV.length == 1
+  Dir.chdir(ARGV[0])
+end
+
+suite_points = {}
+test_points = {}
+
+IO.readlines('tmc_available_points.txt').map(&:strip).each do |line|
+  if line =~ /\[(suite|test)\] \[(.*)\] (.*)/
+    type = $1
+    name = $2
+    points = $3.split(' ')
+    result = if type == 'suite' then suite_points else test_points end
+    result[name] ||= []
+    result[name] += points
+  else
+    puts "Warning: weird line in available points file:"
+    puts line
+  end
+end
+
+
+result = []
+
+document = Nokogiri::XML::Document.parse(File.read('tmc_test_results.xml')) { |config| config.nonet }
+document.css('suite').each do |suite|
+  suite_name = suite.css('title').text
+
+  suite.css('test').each do |test|
+    test_name = test.css('id').text
+    status = if test['result'] == 'success' then 'PASSED' else test['result'].upcase end
+    status = 'FAILED' if status.empty?
+
+    result << {
+      className: suite_name,
+      methodName: test_name,
+      message: test.css('message').text,
+      status: status,
+      pointNames: (suite_points[suite_name] || []) + (test_points[test_name] || [])
+      #TODO: valgrind info
+    }
+  end
+end
+
+puts JSON.generate(result)
+
+#TODO: unit test this
