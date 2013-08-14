@@ -9,7 +9,13 @@ SO_FILE=libtmccheck.so
 PKG_CONFIG_FILE=tmccheck.pc
 CONVERTER=tmc-check-convert-results
 
-all: libtmccheck.so
+all: rubygems libtmccheck.so
+
+rubygems: .rubygems_installed
+
+.rubygems_installed:
+	bundle install
+	touch .rubygems_installed
 
 $(SO_FILE): tmc-check.o
 	gcc -o $@ -g -O1 tmc-check.o -shared
@@ -21,6 +27,7 @@ tmc-check.o: $(SRC_FILES) $(HEADER_FILES)
 clean:
 	make -C example clean
 	rm -f *.o $(SO_FILE) $(PKG_CONFIG_FILE)
+	rm -f .rubygems_installed
 
 run-example:
 	make -C example run-example
