@@ -7,6 +7,7 @@ SRC_FILES=tmc-check.c
 HEADER_FILES=tmc-check.h
 SO_FILE=libtmccheck.so
 PKG_CONFIG_FILE=tmccheck.pc
+CONVERTER=tmc-check-convert-results
 
 all: libtmccheck.so
 
@@ -28,6 +29,7 @@ $(PKG_CONFIG_FILE): $(PKG_CONFIG_FILE).in
 	sed 's|__PREFIX__|$(PREFIX)|' < $< > $@
 
 install: $(SO_FILE) $(PKG_CONFIG_FILE)
+	install -m 755 $(CONVERTER) $(PREFIX)/bin
 	install -m 755 -d $(PREFIX)/include
 	install -m 755 -d $(PREFIX)/lib
 	install -m 755 -d $(PREFIX)/lib/pkgconfig
@@ -40,5 +42,6 @@ install: $(SO_FILE) $(PKG_CONFIG_FILE)
 
 uninstall:
 	for header in $(HEADER_FILES); do rm -f $(PREFIX)/include/$$header; done
+	rm -f $(PREFIX)/bin/$(CONVERTER)
 	rm -f $(PREFIX)/lib/$(SO_FILE) $(PREFIX)/lib/$(SO_FILE).*
 	rm -f $(PREFIX)/lib/pkgconfig/$(PKG_CONFIG_FILE)
