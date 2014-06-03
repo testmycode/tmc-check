@@ -36,10 +36,11 @@ $(PKG_CONFIG_FILE): $(PKG_CONFIG_FILE).in
 	sed 's|__PREFIX__|$(PREFIX)|' < $< > $@
 
 install: $(SO_FILE) $(PKG_CONFIG_FILE)
-	install -m 755 $(CONVERTER) $(PREFIX)/bin
+	install -m 755 -d $(PREFIX)/bin
 	install -m 755 -d $(PREFIX)/include
 	install -m 755 -d $(PREFIX)/lib
 	install -m 755 -d $(PREFIX)/lib/pkgconfig
+	install -m 755 $(CONVERTER) $(PREFIX)/bin
 	install -m 644 $(HEADER_FILES) $(PREFIX)/include
 	install -m 644 -T $(SO_FILE) $(PREFIX)/lib/$(SO_FILE).0.0.0
 	install -m 644 $(PKG_CONFIG_FILE) $(PREFIX)/lib/pkgconfig
