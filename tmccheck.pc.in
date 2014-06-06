@@ -8,5 +8,5 @@ Description: TMC extension to the Check unit test framework
 URL: http://github.com/testmycode
 Version: 0.1
 Requires: check >= 0.9.8
-Libs: -ltmccheck
+Libs: -L${libdir} -ltmccheck
 Cflags: -I${includedir} -pthread
