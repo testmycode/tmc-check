@@ -179,10 +179,10 @@ static void parse_points(const char *points, PointsList **target_list)
     const char *p = points;
     const char *q = p;
     while (*q != '\0') {
-        if (isspace(*q)) {
+        if (isspace((int)*q)) {
             const ssize_t len = q - p;
 
-            if (!isspace(*p)) {
+            if (!isspace((int)*p)) {
                 add_to_point_set(p, len, target_list);
             }
 
@@ -193,7 +193,7 @@ static void parse_points(const char *points, PointsList **target_list)
         }
     }
 
-    if (!isspace(*p) && q > p) {
+    if (!isspace((int)*p) && q > p) {
         const ssize_t len = q - p;
         add_to_point_set(p, len, target_list);
     }
