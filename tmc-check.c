@@ -35,6 +35,10 @@ static void parse_points(const char *points, PointsList **target_list);
 static void add_to_point_set(const char *point, ssize_t len, PointsList **target_list);
 static int points_list_contains(const PointsList *list, const char *point, ssize_t len);
 
+static void delete_points_assoc();
+static void delete_suite_points();
+static void delete_all_points();
+
 void tmc_set_tcase_points(TCase *tc, const char *tc_name, const char *points)
 {
     PointsAssoc *pa = (PointsAssoc*)malloc(sizeof(PointsAssoc));
@@ -74,40 +78,6 @@ Suite* tmc_suite_create(const char *name, const char *points)
     return s;
 }
 
-void delete_points_assoc(void)
-{
-    PointsAssoc *pa = points_assocs;
-    while(pa) {
-        PointsAssoc *next = pa->next;
-        free(pa);
-        pa = next;
-    }
-    points_assocs = NULL;
-}
-
-void delete_all_points(void)
-{
-    PointsList *pl = all_points;
-    while(pl) {
-        PointsList *next = pl->next;
-        if (pl->point)
-            free(pl->point);
-        free(pl);
-        pl = next;
-    }
-    all_points = NULL;
-}
-
-void delete_suite_points(void)
-{
-    SuitePoints *sp = suite_points;
-    while(sp) {
-        SuitePoints *next = sp->next;
-        free(sp);
-        sp = next;
-    }
-    suite_points = NULL;
-}
 int tmc_run_tests(int argc, const char **argv, Suite *s)
 {
     int i;
@@ -223,3 +193,37 @@ static int points_list_contains(const PointsList *list, const char *point, ssize
     return 0;
 }
 
+static void delete_points_assoc()
+{
+    PointsAssoc *pa = points_assocs;
+    while(pa) {
+        PointsAssoc *next = pa->next;
+        free(pa);
+        pa = next;
+    }
+    points_assocs = NULL;
+}
+
+static void delete_suite_points()
+{
+    SuitePoints *sp = suite_points;
+    while(sp) {
+        SuitePoints *next = sp->next;
+        free(sp);
+        sp = next;
+    }
+    suite_points = NULL;
+}
+
+
+static void delete_all_points()
+{
+    PointsList *pl = all_points;
+    while(pl) {
+        PointsList *next = pl->next;
+        free(pl->point);
+        free(pl);
+        pl = next;
+    }
+    all_points = NULL;
+}

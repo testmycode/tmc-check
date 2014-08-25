@@ -10,7 +10,7 @@ clean:
 run-example: tmc-check-example
 	# Printing available points
 	env LD_LIBRARY_PATH=".:$(LD_LIBRARY_PATH)" ./tmc-check-example --print-available-points
-	# Running test. There should be one success and one failure.
+	# Running test. There should be one success and one error.
 	env LD_LIBRARY_PATH=".:$(LD_LIBRARY_PATH)" ./tmc-check-example
 	# Converting results to a form understandable by tmc-server
 	../tmc-check-convert-results > test_output.txt
