@@ -74,6 +74,40 @@ Suite* tmc_suite_create(const char *name, const char *points)
     return s;
 }
 
+void delete_points_assoc(void)
+{
+    PointsAssoc *pa = points_assocs;
+    while(pa) {
+        PointsAssoc *next = pa->next;
+        free(pa);
+        pa = next;
+    }
+    points_assocs = NULL;
+}
+
+void delete_all_points(void)
+{
+    PointsList *pl = all_points;
+    while(pl) {
+        PointsList *next = pl->next;
+        if (pl->point)
+            free(pl->point);
+        free(pl);
+        pl = next;
+    }
+    all_points = NULL;
+}
+
+void delete_suite_points(void)
+{
+    SuitePoints *sp = suite_points;
+    while(sp) {
+        SuitePoints *next = sp->next;
+        free(sp);
+        sp = next;
+    }
+    suite_points = NULL;
+}
 int tmc_run_tests(int argc, const char **argv, Suite *s)
 {
     int i;
@@ -98,6 +132,10 @@ int tmc_run_tests(int argc, const char **argv, Suite *s)
     srunner_set_xml(sr, "tmc_test_results.xml");
     srunner_run_all(sr, CK_VERBOSE);
     srunner_free(sr);
+
+    delete_points_assoc();
+    delete_all_points();
+    delete_suite_points();
 
     return EXIT_SUCCESS;
 }
@@ -141,10 +179,10 @@ static void parse_points(const char *points, PointsList **target_list)
     const char *p = points;
     const char *q = p;
     while (*q != '\0') {
-        if (isspace(*q)) {
+        if (isspace((int)*q)) {
             const ssize_t len = q - p;
 
-            if (!isspace(*p)) {
+            if (!isspace((int)*p)) {
                 add_to_point_set(p, len, target_list);
             }
 
@@ -155,7 +193,7 @@ static void parse_points(const char *points, PointsList **target_list)
         }
     }
 
-    if (!isspace(*p) && q > p) {
+    if (!isspace((int)*p) && q > p) {
         const ssize_t len = q - p;
         add_to_point_set(p, len, target_list);
     }
