@@ -51,11 +51,11 @@ void tmc_set_tcase_points(TCase *tc, const char *tc_name, const char *points)
     parse_points(points, &all_points);
 }
 
-void _tmc_register_test(Suite *s, TFun tf, const char *fname, const char *points)
+void _tmc_register_test(Suite *s, TTest *tt, const char *fname, const char *points)
 {
     TCase *tc = tcase_create(fname);
     tmc_set_tcase_points(tc, fname, points);
-    _tcase_add_test(tc, tf, fname, 0, 0, 0, 1);
+    _tcase_add_test(tc, tt, 0, 0, 0, 1);
     suite_add_tcase(s, tc);
 }
 
